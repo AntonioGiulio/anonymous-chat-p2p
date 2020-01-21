@@ -137,7 +137,20 @@ public class AnonymousChatImpl implements AnonymousChat {
 
 	@Override
 	public boolean leaveRoom(String _room_name) {
-		// TODO Auto-generated method stub
+		try {
+			FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
+			futureGet.awaitUninterruptibly();
+			if(futureGet.isSuccess()) {
+				HashSet<PeerAddress> peers_in_room;
+				peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+				peers_in_room.remove(dht.peer().peerAddress());
+				dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
+				chat_rooms.remove(_room_name);
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -161,7 +174,9 @@ public class AnonymousChatImpl implements AnonymousChat {
 
 	@Override
 	public boolean leaveNetwork() {
-		
+		for(String room: chat_rooms)
+			leaveRoom(room);
+		dht.peer().announceShutdown().start().awaitUninterruptibly();
 		return false;
 	}
 

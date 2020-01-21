@@ -50,10 +50,18 @@ public class TestChat {
 				
 				int option = textIO.newIntInputReader()
 						.withMaxVal(9)
-						.withMinVal(1)
+						.withMinVal(0)
 						.read("Option: ");
 				
 				switch (option) {
+				case 0:
+					terminal.printf("\nARE YOU SURE TO LEAVE NETWORK?\n");
+					boolean exit = textIO.newBooleanInputReader().withDefaultValue(false).read("exit?");
+					if(exit) {
+						peer.leaveNetwork();
+						System.exit(0);
+					}
+					break;
 				case 1:
 					terminal.printf("\nENTER ROOM NAME\n");
 					room_name = textIO.newStringInputReader()
@@ -130,6 +138,7 @@ public class TestChat {
 		terminal.printf("\n3 - JOIN TO CHAT ROOM\n");
 		terminal.printf("\n4 - JOIN TO SECRET CHAT ROOM\n");
 		
+		terminal.printf("\n0 - EXIT\n");
 	}
 
 }
