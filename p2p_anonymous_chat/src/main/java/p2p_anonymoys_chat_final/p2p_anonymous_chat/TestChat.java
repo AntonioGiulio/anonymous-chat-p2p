@@ -132,6 +132,7 @@ public class TestChat {
 
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static void printMenu(TextTerminal terminal) {
 		terminal.printf("\n1 - CREATE CHAT ROOM\n");
 		terminal.printf("\n2 - CREATE SECRET CHAT ROOM\n");
