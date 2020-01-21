@@ -2,12 +2,15 @@ package p2p_anonymoys_chat_final.p2p_anonymous_chat;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.PeerBuilderDHT;
 import net.tomp2p.dht.PeerDHT;
 import net.tomp2p.futures.FutureBootstrap;
+import net.tomp2p.futures.FutureDirect;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerBuilder;
 import net.tomp2p.peers.Number160;
@@ -22,6 +25,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 	final private int DEFAULT_MASTER_PORT = 4000;
 	
 	final private ArrayList<String> chat_rooms = new ArrayList<String>();
+	final private HashMap<String, String> nick_map = new HashMap<String, String>();
 	
 	public AnonymousChatImpl(int _id, String _master_peer, final MessageListener _listener) throws Exception {
 		
@@ -57,6 +61,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 				peers_in_room.add(dht.peer().peerAddress());
 				dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 				chat_rooms.add(_room_name);
+				nick_map.put(_room_name, this.generateNickname());
 				return true;				
 			}
 			return false;			
@@ -98,6 +103,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					peers_in_room.add(dht.peer().peerAddress());
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
+					nick_map.put(_room_name, this.generateNickname());
 					return true;
 				}				
 			}else
@@ -138,26 +144,70 @@ public class AnonymousChatImpl implements AnonymousChat {
 	@Override
 	public boolean leaveRoom(String _room_name) {
 		try {
-			FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
-			futureGet.awaitUninterruptibly();
-			if(futureGet.isSuccess()) {
-				HashSet<PeerAddress> peers_in_room;
-				peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
-				peers_in_room.remove(dht.peer().peerAddress());
-				dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
-				chat_rooms.remove(_room_name);
-				return true;
+			if(chat_rooms.contains(_room_name)) {
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
+				futureGet.awaitUninterruptibly();
+				if(futureGet.isSuccess()) {
+					HashSet<PeerAddress> peers_in_room;
+					peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+					peers_in_room.remove(dht.peer().peerAddress());
+					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
+					chat_rooms.remove(_room_name);
+					nick_map.remove(_room_name);
+					return true;
+				}
 			}
+			return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean sendMessage(String _room_name, String _text_message) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean flag_1 = false;
+		boolean flag_2 = false;
+		
+		try {
+			if(chat_rooms.contains(_room_name)) {
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
+				futureGet.awaitUninterruptibly();
+				if(futureGet.isSuccess()) {
+					HashSet<PeerAddress> peers_in_room;
+					peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+					for(PeerAddress peer: peers_in_room) {
+						FutureDirect futureDirect = dht.peer().sendDirect(peer).object("<<"+nick_map.get(_room_name)+">> "+_text_message).start();
+						futureDirect.awaitUninterruptibly();
+					}
+					flag_1 = true;
+				}
+				
+				/*
+				 * parte relativa al backup
+				 */
+				FutureGet futureGet_b = dht.get(Number160.createHash(_room_name+"_backup")).start();
+				futureGet_b.awaitUninterruptibly();
+				ArrayList<String> allChat = null;
+				if(futureGet_b.isSuccess()) {
+					if(futureGet_b.isEmpty())
+						allChat = new ArrayList<String>();
+					else
+						allChat = (ArrayList<String>) futureGet_b.dataMap().values().iterator().next().object();
+					flag_2 = true;						
+				}
+				allChat.add("<<"+nick_map.get(_room_name)+">> "+_text_message);
+				dht.put(Number160.createHash(_room_name+"_backup")).data(new Data(allChat)).start().awaitUninterruptibly();
+				if(flag_1 && flag_2){
+					return true;
+				}
+			}else
+				return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;		
 	}
 
 	@Override
@@ -178,6 +228,15 @@ public class AnonymousChatImpl implements AnonymousChat {
 			leaveRoom(room);
 		dht.peer().announceShutdown().start().awaitUninterruptibly();
 		return false;
+	}
+	
+	@SuppressWarnings("unused")
+	private String generateNickname() {
+		String nickname;
+		Random rnd = new Random();
+		nickname = ((char)(rnd.nextInt(57)+65)) + "" + ((char)(rnd.nextInt(57)+65)) + "-" + rnd.nextInt(10000);
+		
+		return nickname;
 	}
 
 }

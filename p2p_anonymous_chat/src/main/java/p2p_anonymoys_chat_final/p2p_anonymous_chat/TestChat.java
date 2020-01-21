@@ -120,6 +120,15 @@ public class TestChat {
 					else
 						terminal.printf("\nERROR WHILE JOINING SECRET ROOM\n");
 					break;
+				case 5:
+					terminal.printf("\nENTER ROOM NAME\n");
+					room_name = textIO.newStringInputReader()
+							.withDefaultValue("default-room")
+							.read("Name: ");
+					if(peer.leaveRoom(room_name))
+						terminal.printf("\nSUCCESSFULLY LEAVED %s ROOM\n", room_name);
+					else 
+						terminal.printf("\nERROR WHILE LEAVING ROOM\n");
 				default:
 					break;
 				}
@@ -138,6 +147,7 @@ public class TestChat {
 		terminal.printf("\n2 - CREATE SECRET CHAT ROOM\n");
 		terminal.printf("\n3 - JOIN TO CHAT ROOM\n");
 		terminal.printf("\n4 - JOIN TO SECRET CHAT ROOM\n");
+		terminal.printf("\n5 - EXIT FROM CHAT ROOM\n");
 		
 		terminal.printf("\n0 - EXIT\n");
 	}
