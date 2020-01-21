@@ -1,5 +1,8 @@
 package p2p_anonymoys_chat_final.p2p_anonymous_chat;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
@@ -16,6 +19,7 @@ public class TestChat {
 	private static int id;
 	
 
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) throws Exception {
 		
 		class MessageListenerImpl implements MessageListener{
@@ -28,7 +32,6 @@ public class TestChat {
 			@Override
 			public Object parseMessage(Object obj) {
 				TextIO textIO = TextIoFactory.getTextIO();
-				@SuppressWarnings("rawtypes")
 				TextTerminal terminal = textIO.getTextTerminal();
 				terminal.printf("\n[" + peerId +"] (DM Received) " + obj + "\n\n");
 				return "success";
@@ -129,6 +132,25 @@ public class TestChat {
 						terminal.printf("\nSUCCESSFULLY LEAVED %s ROOM\n", room_name);
 					else 
 						terminal.printf("\nERROR WHILE LEAVING ROOM\n");
+					break;
+				case 6:
+					terminal.printf("\nENTER ROOM NAME\n");
+					room_name = textIO.newStringInputReader()
+							.withDefaultValue("default-room")
+							.read("Name: ");
+					terminal.printf("\nENTER MESSAGE\n");
+					String message = textIO.newStringInputReader()
+							.withDefaultValue("Hello there!")
+							.read("Message: ");
+					GregorianCalendar dt = new GregorianCalendar();
+					String dt_time = dt.get(Calendar.DAY_OF_MONTH) + "/" + dt.get(Calendar.MONTH)+1 + "/" + dt.get(Calendar.YEAR) + " " + dt.get(Calendar.HOUR_OF_DAY) + ":" + dt.get(Calendar.MINUTE);
+					
+					if(peer.sendMessage(room_name, dt_time + " to room [" + room_name + "]--> " + message))
+						terminal.printf("\n SUCCESSFULLY SENT MESSAGE TO %s ROOM\n ", room_name);
+					else
+						terminal.printf("\nERROR WHILE SENDING MESSAGE\n");
+			
+					break;
 				default:
 					break;
 				}
@@ -148,6 +170,7 @@ public class TestChat {
 		terminal.printf("\n3 - JOIN TO CHAT ROOM\n");
 		terminal.printf("\n4 - JOIN TO SECRET CHAT ROOM\n");
 		terminal.printf("\n5 - EXIT FROM CHAT ROOM\n");
+		terminal.printf("\n6 - SEND MESSAGE ON ROOM\n");
 		
 		terminal.printf("\n0 - EXIT\n");
 	}

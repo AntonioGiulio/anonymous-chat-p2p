@@ -141,6 +141,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean leaveRoom(String _room_name) {
 		try {
@@ -178,7 +179,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					HashSet<PeerAddress> peers_in_room;
 					peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
 					for(PeerAddress peer: peers_in_room) {
-						FutureDirect futureDirect = dht.peer().sendDirect(peer).object("<<"+nick_map.get(_room_name)+">> "+_text_message).start();
+						FutureDirect futureDirect = dht.peer().sendDirect(peer).object("<<Guest:"+nick_map.get(_room_name)+">> "+_text_message).start();
 						futureDirect.awaitUninterruptibly();
 					}
 					flag_1 = true;
@@ -197,7 +198,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 						allChat = (ArrayList<String>) futureGet_b.dataMap().values().iterator().next().object();
 					flag_2 = true;						
 				}
-				allChat.add("<<"+nick_map.get(_room_name)+">> "+_text_message);
+				allChat.add("<<Guest"+nick_map.get(_room_name)+">> "+_text_message);
 				dht.put(Number160.createHash(_room_name+"_backup")).data(new Data(allChat)).start().awaitUninterruptibly();
 				if(flag_1 && flag_2){
 					return true;
@@ -230,7 +231,6 @@ public class AnonymousChatImpl implements AnonymousChat {
 		return false;
 	}
 	
-	@SuppressWarnings("unused")
 	private String generateNickname() {
 		String nickname;
 		Random rnd = new Random();
