@@ -79,7 +79,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										p2p_anonymous_chat/distributed_system/TestChat
+										p2p_anonymoys_chat_final/p2p_anonymous_chat/TestChat
 									</mainClass>
 								</manifest>
 							</archive>
