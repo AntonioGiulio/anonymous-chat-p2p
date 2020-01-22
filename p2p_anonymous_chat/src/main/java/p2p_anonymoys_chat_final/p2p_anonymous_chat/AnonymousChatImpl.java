@@ -78,7 +78,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 			futureGet.awaitUninterruptibly();
 			if(futureGet.isSuccess() && futureGet.isEmpty()) {
 				dht.put(Number160.createHash(_room_name+"_psw")).data(new Data(_password)).start().awaitUninterruptibly();
-				this.createRoom(_room_name);
+				this.createRoom(_room_name + "_secret");
 				return true;
 			}else
 				return false;
@@ -126,7 +126,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 						return false;
 					String effective_psw = (String) futureGet.dataMap().values().iterator().next().object();
 					if(_password.equals(effective_psw)) {
-						this.joinRoom(_room_name);
+						this.joinRoom(_room_name + "_secret");
 						return true;
 					}else
 						return false;				
@@ -145,7 +145,8 @@ public class AnonymousChatImpl implements AnonymousChat {
 	@Override
 	public boolean leaveRoom(String _room_name) {
 		try {
-			if(chat_rooms.contains(_room_name)) {
+			_room_name = this.parseName(_room_name);
+			if(_room_name != null) {				
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
 				futureGet.awaitUninterruptibly();
 				if(futureGet.isSuccess()) {
@@ -172,7 +173,9 @@ public class AnonymousChatImpl implements AnonymousChat {
 		boolean flag_2 = false;
 		
 		try {
-			if(chat_rooms.contains(_room_name)) {
+			_room_name = this.parseName(_room_name);
+			if(_room_name != null) {
+				
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
 				futureGet.awaitUninterruptibly();
 				if(futureGet.isSuccess()) {
@@ -198,7 +201,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 						allChat = (ArrayList<String>) futureGet_b.dataMap().values().iterator().next().object();
 					flag_2 = true;						
 				}
-				allChat.add("<<Guest"+nick_map.get(_room_name)+">> "+_text_message);
+				allChat.add("<<Guest:"+nick_map.get(_room_name)+">> "+_text_message);
 				dht.put(Number160.createHash(_room_name+"_backup")).data(new Data(allChat)).start().awaitUninterruptibly();
 				if(flag_1 && flag_2){
 					return true;
@@ -213,19 +216,65 @@ public class AnonymousChatImpl implements AnonymousChat {
 
 	@Override
 	public int getPeersInRoom(String _room_name) {
-		// TODO Auto-generated method stub
-		return 0;
+		try {
+			_room_name = this.parseName(_room_name);
+			if(_room_name != null) {
+				
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
+				futureGet.awaitUninterruptibly();
+				if(futureGet.isSuccess()) {
+					if(futureGet.isEmpty())
+						return -1;
+					@SuppressWarnings("unchecked")
+					HashSet<PeerAddress> peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+					return peers_in_room.size();
+				}
+				return -1;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<String> getRoomBackup(String _room_name) {
-		// TODO Auto-generated method stub
+		try {
+			_room_name = this.parseName(_room_name);
+			if(_room_name != null) {
+				
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_backup")).start();
+				futureGet.awaitUninterruptibly();
+				ArrayList<String> allChat = null;
+				if(futureGet.isSuccess()) {
+					allChat = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
+					return allChat;
+				}				
+			}else 
+				return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override
+	public ArrayList<String> listsRoom() {
+		try {
+			if(chat_rooms.size() == 0)
+				return null;
+			return chat_rooms;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	@Override
 	public boolean leaveNetwork() {
-		for(String room: chat_rooms)
+		for(String room: new ArrayList<String>(chat_rooms))
 			leaveRoom(room);
 		dht.peer().announceShutdown().start().awaitUninterruptibly();
 		return false;
@@ -238,5 +287,16 @@ public class AnonymousChatImpl implements AnonymousChat {
 		
 		return nickname;
 	}
+	
+	private String parseName(String _room_name) {
+		if(chat_rooms.contains(_room_name))
+			return _room_name;
+		else if(chat_rooms.contains(_room_name+"_secret"))
+			return _room_name.concat("_secret");
+		else
+			return null;
+	}
+
+
 
 }

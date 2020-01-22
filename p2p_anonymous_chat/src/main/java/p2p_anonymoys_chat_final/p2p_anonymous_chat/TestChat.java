@@ -1,8 +1,11 @@
 package p2p_anonymoys_chat_final.p2p_anonymous_chat;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.beryx.textio.TerminalProperties;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
@@ -19,7 +22,7 @@ public class TestChat {
 	private static int id;
 	
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) throws Exception {
 		
 		class MessageListenerImpl implements MessageListener{
@@ -45,6 +48,7 @@ public class TestChat {
 			parser.parseArgument(args);
 			TextIO textIO = TextIoFactory.getTextIO();
 			TextTerminal terminal = textIO.getTextTerminal();
+			terminal.getProperties().setPromptColor(Color.cyan);
 			
 			AnonymousChatImpl peer = new AnonymousChatImpl(id, master, new MessageListenerImpl(id));
 			String room_name;
@@ -70,10 +74,14 @@ public class TestChat {
 					room_name = textIO.newStringInputReader()
 							.withDefaultValue("default-room")
 							.read("Name: ");
-					if(peer.createRoom(room_name))
+					if(peer.createRoom(room_name)) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\n SUCCESSFULLY CREATED %s ROOM \n", room_name);
-					else
-						terminal.printf("\n ERROR WHILE CREATING ROOM \n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE CREATING ROOM \n"));
 					break;
 					
 				case 2:
@@ -91,22 +99,32 @@ public class TestChat {
 							.withInputMasking(true)
 							.read("Rewrite password: ");
 					if(password.equals(password__1)) {
-						if(peer.createSecretRoom(room_name, password)) 
+						if(peer.createSecretRoom(room_name, password)) {
+							terminal.getProperties().setPromptColor(Color.GREEN);
 							terminal.printf("\nSUCCESSFULLY CREATED %s SECRET ROOM\n", room_name);
-						else
-							terminal.printf("\nERROR WHILE CREATING SECRET ROOM\n");								
+							terminal.getProperties().setPromptColor(Color.cyan);
+						}else
+							terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE CREATING SECRET ROOM \n"));
 					}else
-						terminal.printf("\nERROR IN PASSWORD\n");
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\nPASSWORD ERROR\n"));
 					break;
 				case 3:
 					terminal.printf("\nENTER ROOM NAME\n");
 					room_name = textIO.newStringInputReader()
 							.withDefaultValue("default-room")
 							.read("Name: ");
-					if(peer.joinRoom(room_name))
+					if(peer.joinRoom(room_name)) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\nSUCCESSFULLY ENTERED IN %s ROOM\n", room_name);
-					else 
-						terminal.printf("\nERROR WHILE JOINING ROOM\n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else 
+						terminal.executeWithPropertiesConfigurator(
+							props -> ((TerminalProperties) props).setPromptColor("red"),
+							t -> ((TextTerminal) t).println("\n ERROR WHILE JOINING ROOM \n"));
 					break;
 				case 4:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -118,20 +136,28 @@ public class TestChat {
 							.withDefaultValue("password")
 							.withInputMasking(true)
 							.read("Password: ");
-					if(peer.joinSecretRoom(room_name, psw))
+					if(peer.joinSecretRoom(room_name, psw)) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\nSUCCESSFULLY ENTERED IN %s SECRET ROOM\n", room_name);
-					else
-						terminal.printf("\nERROR WHILE JOINING SECRET ROOM\n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE JOINING SECRET ROOM \n"));
 					break;
 				case 5:
 					terminal.printf("\nENTER ROOM NAME\n");
 					room_name = textIO.newStringInputReader()
 							.withDefaultValue("default-room")
 							.read("Name: ");
-					if(peer.leaveRoom(room_name))
+					if(peer.leaveRoom(room_name)) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\nSUCCESSFULLY LEAVED %s ROOM\n", room_name);
-					else 
-						terminal.printf("\nERROR WHILE LEAVING ROOM\n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else 
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE LEAVING ROOM \n"));
 					break;
 				case 6:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -145,11 +171,61 @@ public class TestChat {
 					GregorianCalendar dt = new GregorianCalendar();
 					String dt_time = dt.get(Calendar.DAY_OF_MONTH) + "/" + dt.get(Calendar.MONTH)+1 + "/" + dt.get(Calendar.YEAR) + " " + dt.get(Calendar.HOUR_OF_DAY) + ":" + dt.get(Calendar.MINUTE);
 					
-					if(peer.sendMessage(room_name, dt_time + " to room [" + room_name + "]--> " + message))
+					if(peer.sendMessage(room_name, dt_time + " to room [" + room_name + "]--> " + message)) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\n SUCCESSFULLY SENT MESSAGE TO %s ROOM\n ", room_name);
-					else
-						terminal.printf("\nERROR WHILE SENDING MESSAGE\n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE SENDIM MESSAGE \n"));
 			
+					break;
+				case 7:
+					ArrayList<String> rooms = peer.listsRoom();
+					if(rooms != null) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
+						terminal.printf("\nYOU ARE READING ON ROOMS: \n");
+						for(String room: rooms) {
+							terminal.printf("\n" + room + "\n");
+						}
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n ERROR WHILE INSPETTING ROOMS \n"));
+					break;
+					
+				case 8:
+					terminal.printf("\nENTER ROOM NAME\n");
+					room_name = textIO.newStringInputReader()
+							.withDefaultValue("default-room")
+							.read("Name: ");
+					ArrayList<String> backup = peer.getRoomBackup(room_name);
+					if(backup != null) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
+						for(String msg: backup)
+							terminal.printf("\n" + msg + "\n");
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+							props -> ((TerminalProperties) props).setPromptColor("red"),
+							t -> ((TextTerminal) t).println("\n ERROR WHILE MANAGING BACKUP CHAT \n"));
+					break;
+				case 9:
+					terminal.printf("\nENTER ROOM NAME\n");
+					room_name = textIO.newStringInputReader()
+							.withDefaultValue("default_room")
+							.read("Name: ");
+					int num_of_peers = peer.getPeersInRoom(room_name);
+					if(num_of_peers != -1) {
+						terminal.getProperties().setPromptColor(Color.GREEN);
+						terminal.printf("\nNUMBER OF PEERS ACTIVE ON %s ROOM: %d", room_name, num_of_peers);
+						terminal.getProperties().setPromptColor(Color.cyan);
+					}else
+						terminal.executeWithPropertiesConfigurator(
+								props -> ((TerminalProperties) props).setPromptColor("red"),
+								t -> ((TextTerminal) t).println("\n THERE ARE NO PEERS IN THIS ROOM \n"));
 					break;
 				default:
 					break;
@@ -171,6 +247,9 @@ public class TestChat {
 		terminal.printf("\n4 - JOIN TO SECRET CHAT ROOM\n");
 		terminal.printf("\n5 - EXIT FROM CHAT ROOM\n");
 		terminal.printf("\n6 - SEND MESSAGE ON ROOM\n");
+		terminal.printf("\n7 - VIEW LIST OF YUOURS CHATS\n");
+		terminal.printf("\n8 - SHOW BACKUP OF A CHAT ROOM\n");
+		terminal.printf("\n9 - SHOW HOW MANY PEERS ARE ACTIVE IN A ROOM\n");
 		
 		terminal.printf("\n0 - EXIT\n");
 	}

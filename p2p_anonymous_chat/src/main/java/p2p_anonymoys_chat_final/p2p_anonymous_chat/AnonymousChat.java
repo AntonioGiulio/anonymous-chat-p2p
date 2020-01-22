@@ -17,6 +17,8 @@ public interface AnonymousChat {
 	public boolean sendMessage(String _room_name, String _text_message);
 	
 	public int getPeersInRoom(String _room_name);
+	
+	public ArrayList<String> listsRoom();
 
 	public ArrayList<String> getRoomBackup(String _room_name);
 	
