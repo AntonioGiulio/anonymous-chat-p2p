@@ -54,45 +54,51 @@ public class AnonymousChatImpl implements AnonymousChat {
 	@Override
 	public boolean createRoom(String _room_name) {
 		try {
-			FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
-			futureGet.awaitUninterruptibly();
-			if (futureGet.isSuccess() && futureGet.isEmpty()) {
-				HashSet<PeerAddress> peers_in_room = new HashSet<PeerAddress>();
-				peers_in_room.add(dht.peer().peerAddress());
-				dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
-				chat_rooms.add(_room_name);
-				nick_map.put(_room_name, this.generateNickname());
-				return true;				
-			}
-			return false;			
+			if(this.parseName(_room_name) == null) {
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
+				futureGet.awaitUninterruptibly();
+				if (futureGet.isSuccess() && futureGet.isEmpty()) {
+					HashSet<PeerAddress> peers_in_room = new HashSet<PeerAddress>();
+					peers_in_room.add(dht.peer().peerAddress());
+					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
+					chat_rooms.add(_room_name);
+					nick_map.put(_room_name, this.generateNickname());
+					System.out.printf("ho creato pure la stanza con il nome %s" , _room_name);
+					return true;				
+				}
+				return false;
+			}		
 		}catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		}
+		return false;
 	}
 
 	@Override
 	public boolean createSecretRoom(String _room_name, String _password) {
 		try {
-			FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_psw")).start();
-			futureGet.awaitUninterruptibly();
-			if(futureGet.isSuccess() && futureGet.isEmpty()) {
-				dht.put(Number160.createHash(_room_name+"_psw")).data(new Data(_password)).start().awaitUninterruptibly();
-				this.createRoom(_room_name + "_secret");
-				return true;
-			}else
-				return false;
+			if(this.parseName(_room_name) == null) {
+				FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_psw")).start();
+				futureGet.awaitUninterruptibly();
+				if(futureGet.isSuccess() && futureGet.isEmpty()) {
+					dht.put(Number160.createHash(_room_name+"_psw")).data(new Data(_password)).start().awaitUninterruptibly();
+					System.out.println("ho creato l'hash per la passworld");
+					this.createRoom(_room_name + "_secret");
+					return true;
+				}else
+					return false;
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
-			return false;
 		}
+		return false;
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public boolean joinRoom(String _room_name) {
 		try {
-			if (!chat_rooms.contains(_room_name)) {
+			if (this.parseName(_room_name) == null) {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
 				futureGet.awaitUninterruptibly();
 				if(futureGet.isSuccess()) {
@@ -118,7 +124,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 	@Override
 	public boolean joinSecretRoom(String _room_name, String _password) {
 		try {
-			if(!chat_rooms.contains(_room_name)) {
+			if(this.parseName(_room_name) == null) {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_psw")).start();
 				futureGet.awaitUninterruptibly();
 				if(futureGet.isSuccess()) {
