@@ -185,7 +185,7 @@ public class TestChat {
 					ArrayList<String> rooms = peer.listsRoom();
 					if(rooms != null) {
 						terminal.getProperties().setPromptColor(Color.GREEN);
-						terminal.printf("\nYOU AREN'T READING ON ANY ROOM: \n");
+						terminal.printf("\nYOU ARE READING ON ROOMS: \n");
 						for(String room: rooms) {
 							terminal.printf("\n" + room + "\n");
 						}
@@ -193,7 +193,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE INSPETTING ROOMS \n"));
+								t -> ((TextTerminal) t).println("\n YOU AREN'T READING ON ANY ROOM\n"));
 					break;
 					
 				case 8:

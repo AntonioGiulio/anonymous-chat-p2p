@@ -111,7 +111,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
 					nick_map.put(_room_name, this.generateNickname());
-					this.sendMessage(_room_name, "Hello There [" + nick_map.get(_room_name) + "]!");
+					this.sendMessage(_room_name, "[room: " + _room_name + "]Hello There [" + nick_map.get(_room_name) + "]!");
 					return true;
 				}				
 			}else
@@ -171,7 +171,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 							return true;
 						}
 					}
-					this.sendMessage(_room_name, "-- leaving this room --");
+					this.sendMessage(_room_name, "[ " + _room_name + "] -- leaving this room -- [" + nick_map.get(_room_name) + "]!");
 					HashSet<PeerAddress> peers_in_room;
 					peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
 					peers_in_room.remove(dht.peer().peerAddress());
