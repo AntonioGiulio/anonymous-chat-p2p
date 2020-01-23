@@ -64,7 +64,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
 					nick_map.put(_room_name, this.generateNickname());
-					this.sendMessage(_room_name, "I'm creator of this room!");
+					this.sendMessage(_room_name, "I'm creator of this room [" + nick_map.get(_room_name) + "]!");
 					return true;				
 				}
 				return false;
@@ -111,7 +111,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
 					nick_map.put(_room_name, this.generateNickname());
-					this.sendMessage(_room_name, "Hello There!");
+					this.sendMessage(_room_name, "Hello There [" + nick_map.get(_room_name) + "]!");
 					return true;
 				}				
 			}else
