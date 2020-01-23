@@ -81,7 +81,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE CREATING ROOM \n"));
+								t -> ((TextTerminal) t).println("\n THIS ROOM ALREADY EXIST \n"));
 					break;
 					
 				case 2:
@@ -106,7 +106,7 @@ public class TestChat {
 						}else
 							terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE CREATING SECRET ROOM \n"));
+								t -> ((TextTerminal) t).println("\n THIS ROOM ALREADY EXIST \n"));
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
@@ -124,7 +124,7 @@ public class TestChat {
 					}else 
 						terminal.executeWithPropertiesConfigurator(
 							props -> ((TerminalProperties) props).setPromptColor("red"),
-							t -> ((TextTerminal) t).println("\n ERROR WHILE JOINING ROOM \n"));
+							t -> ((TextTerminal) t).println("\n THIS ROOM DOESN'T EXIST OR YOU ARE IN THAT ALREDY \n"));
 					break;
 				case 4:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -143,7 +143,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE JOINING SECRET ROOM \n"));
+								t -> ((TextTerminal) t).println("\n THIS SECRET ROOM DOESN'T EXIST OR PASSWORD IS WRONG OR YOU ARE IN THAT ALREADY \n"));
 					break;
 				case 5:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -157,7 +157,7 @@ public class TestChat {
 					}else 
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE LEAVING ROOM \n"));
+								t -> ((TextTerminal) t).println("\n YOU AREN'T IN THIS ROOM \n"));
 					break;
 				case 6:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -185,7 +185,7 @@ public class TestChat {
 					ArrayList<String> rooms = peer.listsRoom();
 					if(rooms != null) {
 						terminal.getProperties().setPromptColor(Color.GREEN);
-						terminal.printf("\nYOU ARE READING ON ROOMS: \n");
+						terminal.printf("\nYOU AREN'T READING ON ANY ROOM: \n");
 						for(String room: rooms) {
 							terminal.printf("\n" + room + "\n");
 						}
@@ -210,7 +210,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 							props -> ((TerminalProperties) props).setPromptColor("red"),
-							t -> ((TextTerminal) t).println("\n ERROR WHILE MANAGING BACKUP CHAT \n"));
+							t -> ((TextTerminal) t).println("\n THIS ROOM DOSN'T EXIST \n"));
 					break;
 				case 9:
 					terminal.printf("\nENTER ROOM NAME\n");
@@ -220,12 +220,12 @@ public class TestChat {
 					int num_of_peers = peer.getPeersInRoom(room_name);
 					if(num_of_peers != -1) {
 						terminal.getProperties().setPromptColor(Color.GREEN);
-						terminal.printf("\nNUMBER OF PEERS ACTIVE ON %s ROOM: %d", room_name, num_of_peers);
+						terminal.printf("\nNUMBER OF PEERS ACTIVE ON %s ROOM: %d\n", room_name, num_of_peers);
 						terminal.getProperties().setPromptColor(Color.cyan);
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n THERE ARE NO PEERS IN THIS ROOM \n"));
+								t -> ((TextTerminal) t).println("\n THIS ROOM DOESN'T EXIST \n"));
 					break;
 				default:
 					break;

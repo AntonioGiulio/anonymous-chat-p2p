@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import net.tomp2p.dht.FutureGet;
+import net.tomp2p.dht.FutureRemove;
 import net.tomp2p.dht.PeerBuilderDHT;
 import net.tomp2p.dht.PeerDHT;
 import net.tomp2p.futures.FutureBootstrap;
@@ -63,7 +64,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
 					nick_map.put(_room_name, this.generateNickname());
-					System.out.printf("ho creato pure la stanza con il nome %s" , _room_name);
+					this.sendMessage(_room_name, "I'm creator of this room!");
 					return true;				
 				}
 				return false;
@@ -80,9 +81,9 @@ public class AnonymousChatImpl implements AnonymousChat {
 			if(this.parseName(_room_name) == null) {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_psw")).start();
 				futureGet.awaitUninterruptibly();
-				if(futureGet.isSuccess() && futureGet.isEmpty()) {
+				if(futureGet.isEmpty()) System.out.println("ho successo!!!");
+				if(futureGet.isSuccess()) {
 					dht.put(Number160.createHash(_room_name+"_psw")).data(new Data(_password)).start().awaitUninterruptibly();
-					System.out.println("ho creato l'hash per la passworld");
 					this.createRoom(_room_name + "_secret");
 					return true;
 				}else
@@ -110,6 +111,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 					dht.put(Number160.createHash(_room_name)).data(new Data(peers_in_room)).start().awaitUninterruptibly();
 					chat_rooms.add(_room_name);
 					nick_map.put(_room_name, this.generateNickname());
+					this.sendMessage(_room_name, "Hello There!");
 					return true;
 				}				
 			}else
@@ -156,6 +158,20 @@ public class AnonymousChatImpl implements AnonymousChat {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
 				futureGet.awaitUninterruptibly();
 				if(futureGet.isSuccess()) {
+					if(this.getPeersInRoom(_room_name) == 1) {
+						FutureRemove futureRemove_s = dht.remove(Number160.createHash(_room_name)).start();
+						futureRemove_s.awaitUninterruptibly();
+						FutureRemove futureRemove_b = dht.remove(Number160.createHash(_room_name+"_backup")).start();
+						futureRemove_b.awaitUninterruptibly();
+						FutureRemove futureRemove_p = dht.remove(Number160.createHash(_room_name+"_psw")).start();
+						futureRemove_p.awaitUninterruptibly();
+						if(futureRemove_s.isSuccess() && futureRemove_b.isSuccess() && futureRemove_p.isSuccess()) {
+							chat_rooms.remove(_room_name);
+							nick_map.remove(_room_name);
+							return true;
+						}
+					}
+					this.sendMessage(_room_name, "-- leaving this room --");
 					HashSet<PeerAddress> peers_in_room;
 					peers_in_room = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
 					peers_in_room.remove(dht.peer().peerAddress());
