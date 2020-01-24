@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CreateRoomTest {
@@ -26,12 +27,16 @@ public class CreateRoomTest {
 	}
 	
 	
+	@BeforeClass
+	
+	
 	
 	@Test
 	public void test() throws Exception {
 		AnonymousChatImpl masterPeer = new AnonymousChatImpl(0, "127.0.0.1", new MessageListenerImpl(0));
 		
 		assertTrue(masterPeer.createRoom("Storia"));
+		assertFalse(masterPeer.createRoom("Storia"));
 			
 	}
 	
