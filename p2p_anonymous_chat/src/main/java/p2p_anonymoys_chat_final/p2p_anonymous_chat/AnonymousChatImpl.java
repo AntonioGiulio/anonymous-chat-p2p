@@ -58,6 +58,12 @@ public class AnonymousChatImpl implements AnonymousChat {
 			if(this.parseName(_room_name) == null) {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name)).start();
 				futureGet.awaitUninterruptibly();
+				if(!_room_name.contains("_secret")) {
+					FutureGet futureGet_control = dht.get(Number160.createHash(_room_name+"_secret")).start();
+					futureGet_control.awaitUninterruptibly();
+					if(!futureGet_control.isEmpty())
+						return false;
+				}
 				if (futureGet.isSuccess() && futureGet.isEmpty()) {
 					HashSet<PeerAddress> peers_in_room = new HashSet<PeerAddress>();
 					peers_in_room.add(dht.peer().peerAddress());
@@ -81,11 +87,13 @@ public class AnonymousChatImpl implements AnonymousChat {
 			if(this.parseName(_room_name) == null) {
 				FutureGet futureGet = dht.get(Number160.createHash(_room_name+"_psw")).start();
 				futureGet.awaitUninterruptibly();
-				if(futureGet.isEmpty()) System.out.println("ho successo!!!");
 				if(futureGet.isSuccess()) {
 					dht.put(Number160.createHash(_room_name+"_psw")).data(new Data(_password)).start().awaitUninterruptibly();
-					this.createRoom(_room_name + "_secret");
-					return true;
+					FutureGet futureGet_control = dht.get(Number160.createHash(_room_name)).start();
+					futureGet_control.awaitUninterruptibly();
+					if(futureGet_control.isSuccess() && futureGet_control.isEmpty())
+						if(this.createRoom(_room_name + "_secret"))
+							return true;
 				}else
 					return false;
 			}
@@ -283,7 +291,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 	}
 	
 	@Override
-	public ArrayList<String> listsRoom() {
+	public ArrayList<String> listRooms() {
 		try {
 			if(chat_rooms.size() == 0)
 				return null;
@@ -299,7 +307,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 		for(String room: new ArrayList<String>(chat_rooms))
 			leaveRoom(room);
 		dht.peer().announceShutdown().start().awaitUninterruptibly();
-		return false;
+		return true;
 	}
 	
 	private String generateNickname() {

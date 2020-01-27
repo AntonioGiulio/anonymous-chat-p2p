@@ -9,15 +9,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
-public class CreateRoomTest {
+public class getPeersInRoomTest {
+	
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
 	private static AnonymousChatImpl peer3;
-	
 	
 	@BeforeClass 
 	public static void init() throws Exception {
@@ -45,33 +42,42 @@ public class CreateRoomTest {
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
 	}
 	
-	
-	
 	@Test
-	public void test() throws Exception {
+	public void test() {
+		masterPeer.createRoom("Master_Room");
 		
-		assertTrue(masterPeer.createRoom("Master_Room"));
 		/*
-		 * verifichiamo che il creatore sia già all'interno 
-		 * della room da lui creata e che ci sia solo lui
+		 * Verifico che il masterPeer sia l'unico peer 
+		 * presente nella Master_Room
 		 */
-		assertEquals("Master_Room", masterPeer.listRooms().get(0));
 		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
 		
-		assertTrue(peer1.createRoom("Room_1"));
-		assertTrue(peer2.createRoom("Room_2"));
-		assertTrue(peer3.createRoom("Room_3"));		
+		peer1.joinRoom("Master_Room");
+		peer2.joinRoom("Master_Room");
+		peer3.joinRoom("Master_Room");
 		
-		assertFalse(masterPeer.createRoom("Room_1"));
-		assertFalse(peer1.createRoom("Master_Room"));
-		assertFalse(peer2.createRoom("Room_3"));
-		assertFalse(peer3.createRoom("Room_2"));
+		/*
+		 * Verifico che nella MasterRoom adesso vi siano 4 peers
+		 */
+		assertEquals(4, peer1.getPeersInRoom("Master_Room"));
 		
-			
+		/*
+		 * Se uno o più peers escono dalla room il numero deve 
+		 * decrescere
+		 */
+		peer1.leaveRoom("Master_Room");
+		peer2.leaveRoom("Master_Room");
+		assertEquals(2, peer3.getPeersInRoom("Master_Room"));
+		
+		/*
+		 * Verico che non è possibile verificare il numero di peer
+		 * di una room che non esiste oppure a cui non siamo iscritti
+		 */
+		assertEquals(-1, peer1.getPeersInRoom("Room_1"));
+		peer2.createSecretRoom("Secret_Room", "password");
+		assertEquals(-1, peer3.getPeersInRoom("Secret_Room"));
 	}
-	
-	
-	
+
 	@AfterClass
 	public static void shutDown() {
 		masterPeer.leaveNetwork();
@@ -79,6 +85,4 @@ public class CreateRoomTest {
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
 	}
-	
-
 }

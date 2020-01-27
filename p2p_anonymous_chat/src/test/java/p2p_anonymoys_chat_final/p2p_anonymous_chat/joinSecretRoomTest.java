@@ -9,15 +9,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
-public class CreateRoomTest {
+public class joinSecretRoomTest {
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
 	private static AnonymousChatImpl peer3;
-	
 	
 	@BeforeClass 
 	public static void init() throws Exception {
@@ -44,33 +40,46 @@ public class CreateRoomTest {
 		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
 	}
-	
-	
-	
+
+
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		
-		assertTrue(masterPeer.createRoom("Master_Room"));
+		masterPeer.createSecretRoom("Secret_Room", "password");
+		
 		/*
-		 * verifichiamo che il creatore sia già all'interno 
-		 * della room da lui creata e che ci sia solo lui
+		 * Gli altri peer entrano nella secret room
 		 */
-		assertEquals("Master_Room", masterPeer.listRooms().get(0));
-		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
+		assertTrue(peer1.joinSecretRoom("Secret_Room", "password"));
+		assertTrue(peer2.joinSecretRoom("Secret_Room", "password"));
 		
-		assertTrue(peer1.createRoom("Room_1"));
-		assertTrue(peer2.createRoom("Room_2"));
-		assertTrue(peer3.createRoom("Room_3"));		
+		/*
+		 * Verifichiamo che nella lista delle room a cui 
+		 * sono iscritti i peer ci sia la Secret_Room con il tag _ecret
+		 */
+		assertEquals("Secret_Room_secret", peer1.listRooms().get(0));
+		assertEquals("Secret_Room_secret", peer2.listRooms().get(0));
 		
-		assertFalse(masterPeer.createRoom("Room_1"));
-		assertFalse(peer1.createRoom("Master_Room"));
-		assertFalse(peer2.createRoom("Room_3"));
-		assertFalse(peer3.createRoom("Room_2"));
 		
-			
+		/*
+		 * non si può accedere ad una room segreta sbagliando la 
+		 * password
+		 */
+		assertFalse(peer3.joinSecretRoom("Secret_Room", "passwor"));
+		
+		/*
+		 * Non si può accedere ad una room segreta che non esiste
+		 */
+		assertFalse(masterPeer.joinSecretRoom("Room_1", "psw"));
+		assertFalse(peer2.joinSecretRoom("Room_x", "psw"));
+		
+		/*
+		 * Non si può accedere ad una room segreta a cui si 
+		 * è già iscritti
+		 */
+		assertFalse(peer1.joinSecretRoom("Secret_room", "password"));
+		assertFalse(peer2.joinSecretRoom("Secret_Room", "password"));
 	}
-	
-	
 	
 	@AfterClass
 	public static void shutDown() {
@@ -79,6 +88,5 @@ public class CreateRoomTest {
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
 	}
-	
 
 }

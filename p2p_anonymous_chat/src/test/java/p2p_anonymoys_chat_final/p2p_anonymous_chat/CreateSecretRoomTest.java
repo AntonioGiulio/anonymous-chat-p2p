@@ -9,15 +9,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
-public class CreateRoomTest {
+public class CreateSecretRoomTest {
+	
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
 	private static AnonymousChatImpl peer3;
-	
 	
 	@BeforeClass 
 	public static void init() throws Exception {
@@ -44,32 +41,38 @@ public class CreateRoomTest {
 		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
 	}
-	
-	
-	
+
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		
-		assertTrue(masterPeer.createRoom("Master_Room"));
+		assertTrue(masterPeer.createSecretRoom("Master_Room", "password"));
 		/*
 		 * verifichiamo che il creatore sia già all'interno 
 		 * della room da lui creata e che ci sia solo lui
 		 */
-		assertEquals("Master_Room", masterPeer.listRooms().get(0));
+		assertEquals("Master_Room_secret", masterPeer.listRooms().get(0));
 		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
 		
-		assertTrue(peer1.createRoom("Room_1"));
-		assertTrue(peer2.createRoom("Room_2"));
-		assertTrue(peer3.createRoom("Room_3"));		
+		assertTrue(peer1.createSecretRoom("Room_1", "password"));
+		assertTrue(peer2.createSecretRoom("Room_2", "password"));
+		assertTrue(peer3.createSecretRoom("Room_3", "password"));
 		
-		assertFalse(masterPeer.createRoom("Room_1"));
-		assertFalse(peer1.createRoom("Master_Room"));
-		assertFalse(peer2.createRoom("Room_3"));
-		assertFalse(peer3.createRoom("Room_2"));
+		assertFalse(masterPeer.createSecretRoom("Room_1", "password_1"));
+		assertFalse(peer1.createSecretRoom("Master_Room", "password_2"));
+		assertFalse(peer2.createSecretRoom("Room_3", "pippo"));
+		assertFalse(peer3.createSecretRoom("Room_2", "password"));
 		
-			
+		/*
+		 * Dobbiamo verificare che non sia possibile creare una secret room con lo stesso 
+		 * nome di una public room e viceversa.
+		 */
+				
+		masterPeer.createRoom("Prova_Room");
+		assertFalse(peer1.createSecretRoom("Prova_Room", "password"));
+		
+		peer2.createSecretRoom("Prova_Room_2", "password");
+		assertFalse(peer3.createRoom("Prova_Room_2"));
 	}
-	
 	
 	
 	@AfterClass
@@ -79,6 +82,4 @@ public class CreateRoomTest {
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
 	}
-	
-
 }

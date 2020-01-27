@@ -182,7 +182,7 @@ public class TestChat {
 			
 					break;
 				case 7:
-					ArrayList<String> rooms = peer.listsRoom();
+					ArrayList<String> rooms = peer.listRooms();
 					if(rooms != null) {
 						terminal.getProperties().setPromptColor(Color.GREEN);
 						terminal.printf("\nYOU ARE READING ON ROOMS: \n");

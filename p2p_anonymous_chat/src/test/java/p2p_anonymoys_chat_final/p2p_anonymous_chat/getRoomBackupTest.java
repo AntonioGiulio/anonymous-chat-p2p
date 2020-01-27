@@ -9,15 +9,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
-public class CreateRoomTest {
+public class getRoomBackupTest {
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
 	private static AnonymousChatImpl peer3;
-	
 	
 	@BeforeClass 
 	public static void init() throws Exception {
@@ -44,33 +40,45 @@ public class CreateRoomTest {
 		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
 	}
-	
-	
-	
+
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		
-		assertTrue(masterPeer.createRoom("Master_Room"));
+		masterPeer.createRoom("Master_Room");
+		peer1.joinRoom("Master_Room");
+		peer2.joinRoom("Master_Room");
+		peer3.joinRoom("Master_Room");
+		peer1.sendMessage("Master_Room", "Ciao a tutti!");
+		peer2.sendMessage("Master_Room", "Come va?");
+		peer3.sendMessage("Master_Room", "Tutto bene!");
+		masterPeer.sendMessage("Master_Room", "Tutto bene anche a me!");
+		
 		/*
-		 * verifichiamo che il creatore sia già all'interno 
-		 * della room da lui creata e che ci sia solo lui
+		 * Verifico che sia possibile accedere al backup di una chat
+		 * a cui si è iscritti.
 		 */
-		assertEquals("Master_Room", masterPeer.listRooms().get(0));
-		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
+		assertNotNull(peer1.getRoomBackup("Master_Room"));
 		
-		assertTrue(peer1.createRoom("Room_1"));
-		assertTrue(peer2.createRoom("Room_2"));
-		assertTrue(peer3.createRoom("Room_3"));		
+		/*
+		 * Verifico che non si possa accedere al backup di una 
+		 * chat che abbiamo abbandonato.
+		 */
+		peer2.leaveRoom("Master_Room");
+		assertNull(peer2.getRoomBackup("Master_Room"));
 		
-		assertFalse(masterPeer.createRoom("Room_1"));
-		assertFalse(peer1.createRoom("Master_Room"));
-		assertFalse(peer2.createRoom("Room_3"));
-		assertFalse(peer3.createRoom("Room_2"));
+		/*
+		 * Verifico che si possa accedere al backup di una chat che 
+		 * abbiamo abbandonato e in cui siamo rientrati.
+		 */
+		peer2.joinRoom("Master_Room");
+		assertNotNull(peer2.getRoomBackup("Master_Room"));
 		
-			
+		/*
+		 * Verifico che non si possa accedere al backup di una 
+		 * chat che non esiste.
+		 */
+		assertNull(masterPeer.getRoomBackup("Room_1"));
 	}
-	
-	
 	
 	@AfterClass
 	public static void shutDown() {
@@ -79,6 +87,5 @@ public class CreateRoomTest {
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
 	}
-	
 
 }
