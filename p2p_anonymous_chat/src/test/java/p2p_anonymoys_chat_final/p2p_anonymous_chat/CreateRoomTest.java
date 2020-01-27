@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,7 +21,7 @@ public class CreateRoomTest {
 	private static AnonymousChatImpl peer3;
 	
 	
-	@BeforeClass 
+	@BeforeClass
 	public static void init() throws Exception {
 		class MessageListenerImpl implements MessageListener{
 			int peerId;
@@ -39,17 +41,23 @@ public class CreateRoomTest {
 		}
 		
 		
-		masterPeer = new AnonymousChatImpl(0, "127.0.0.1", new MessageListenerImpl(0));
-		peer1 = new AnonymousChatImpl(1, "127.0.0.1", new MessageListenerImpl(1));
-		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
-		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
+		masterPeer = new AnonymousChatImpl(0, "127.0.0.1", new MessageListenerImpl(10));
+		peer1 = new AnonymousChatImpl(1, "127.0.0.1", new MessageListenerImpl(11));
+		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(12));
+		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(13));
+		System.out.println("Ho creato la network di create room");
+		System.out.println(masterPeer.listRooms());
+		System.out.println(peer1.listRooms());
+		System.out.println(peer2.listRooms());
+		System.out.println(peer3.listRooms());
+		
 	}
 	
 	
 	
 	@Test
 	public void test() throws Exception {
-		
+		System.out.println("inizio a fare sti test di merda");
 		assertTrue(masterPeer.createRoom("Master_Room"));
 		/*
 		 * verifichiamo che il creatore sia già all'interno 
@@ -59,6 +67,8 @@ public class CreateRoomTest {
 		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
 		
 		assertTrue(peer1.createRoom("Room_1"));
+		System.out.println(peer1.listRooms());
+		System.out.println(peer2.listRooms());
 		assertTrue(peer2.createRoom("Room_2"));
 		assertTrue(peer3.createRoom("Room_3"));		
 		
@@ -66,6 +76,8 @@ public class CreateRoomTest {
 		assertFalse(peer1.createRoom("Master_Room"));
 		assertFalse(peer2.createRoom("Room_3"));
 		assertFalse(peer3.createRoom("Room_2"));
+		
+		System.out.println("ho finito di fare sti test di merda");
 		
 			
 	}

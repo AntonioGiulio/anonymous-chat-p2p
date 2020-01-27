@@ -307,6 +307,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 		for(String room: new ArrayList<String>(chat_rooms))
 			leaveRoom(room);
 		dht.peer().announceShutdown().start().awaitUninterruptibly();
+		dht.peer().shutdown();
 		return true;
 	}
 	
