@@ -225,7 +225,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n THIS ROOM DOESN'T EXIST \n"));
+								t -> ((TextTerminal) t).println("\n THIS ROOM DOESN'T EXIST OR YOU AREN'T IN THIS ROOM\n"));
 					break;
 				default:
 					break;

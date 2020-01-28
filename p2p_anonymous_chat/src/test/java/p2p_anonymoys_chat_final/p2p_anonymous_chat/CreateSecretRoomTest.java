@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,12 +40,10 @@ public class CreateSecretRoomTest {
 		peer1 = new AnonymousChatImpl(1, "127.0.0.1", new MessageListenerImpl(1));
 		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
-		System.out.println("Ho creato la network di create secret room");
 	}
 
 	@Test
 	public void test() {
-		System.out.println("Ho iniziato a fare sti test di merda");
 		assertTrue(masterPeer.createSecretRoom("Master_Room", "password"));
 		/*
 		 * verifichiamo che il creatore sia già all'interno 
@@ -84,6 +80,5 @@ public class CreateSecretRoomTest {
 		peer1.leaveNetwork();
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
-		System.out.println("ho distrutto la network");
 	}
 }
