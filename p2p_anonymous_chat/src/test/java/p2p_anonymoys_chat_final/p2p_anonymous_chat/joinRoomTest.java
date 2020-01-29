@@ -58,6 +58,7 @@ public class joinRoomTest {
 		 * Verifichiamo che nella lista delle room a cui 
 		 * sono iscritti i peer ci sia la MasterRoom
 		 */
+		assertEquals("Master_Room", masterPeer.listRooms().get(0));
 		assertEquals("Master_Room", peer1.listRooms().get(0));
 		assertEquals("Master_Room", peer2.listRooms().get(0));
 		assertEquals("Master_Room", peer3.listRooms().get(0));
