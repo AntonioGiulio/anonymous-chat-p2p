@@ -71,6 +71,14 @@ Nella root directory del progetto è presente il Dockerfile in cui ci sono tutti
 Per prima cosa bisogna posizionarsi nella root del progetto "p2p\_anonymous\_chat" dove è presente il Dockerfile, successivamente si può costruire l'immagine eseguendo il comando:
 
 ``docker build --no-cache -t p2p-an-chat .``
+
+Alternativamente a tutta la fase di build è possibile scaricare un'immagine Docker già fatta al link
+
+https://hub.docker.com/r/antoniogiulio/p2p-anonymous-chat
+
+o digitando il comando:
+
+``docker pull antoniogiulio/p2p-anonymous-chat``
 ##### Come lanciare il master peer
 Arrivati a questo punto bisogna lanciare un container istanza dell'immagine Docker appena creata che fungerà da master peer.
 Bisogna lanciare il container in modalità interattiva con l'opzione -i e con due parametri:
