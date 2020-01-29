@@ -12,5 +12,5 @@ WORKDIR /app
 ENV MASTERIP=127.0.0.1
 ENV ID=0
 
-COPY --from=1 /app/target/p2p_anonymous_chat-0.0.1-SNAPSHOT-final.jar /app
-CMD /usr/bin/java -jar p2p_anonymous_chat-0.0.1-SNAPSHOT-final.jar -m $MASTERIP -id $ID
+COPY --from=1 /app/target/p2p_anonymous_chat-0.0.1-SNAPSHOT-jar-with-dependencies.jar /app
+CMD /usr/bin/java -jar p2p_anonymous_chat-0.0.1-SNAPSHOT-jar-with-dependencies.jar -m $MASTERIP -id $ID
