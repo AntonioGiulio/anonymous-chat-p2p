@@ -9,8 +9,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import distibuted_system.p2p_anonymous_chat.AnonymousChatImpl;
-import distibuted_system.p2p_anonymous_chat.MessageListener;
+import distributed_system.p2p_anonymous_chat.AnonymousChatImpl;
+import distributed_system.p2p_anonymous_chat.MessageListener;
 
 public class listRoomsTest {
 	private static AnonymousChatImpl masterPeer;
