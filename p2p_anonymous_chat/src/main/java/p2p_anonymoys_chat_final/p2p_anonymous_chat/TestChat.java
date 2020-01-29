@@ -52,6 +52,7 @@ public class TestChat {
 			
 			AnonymousChatImpl peer = new AnonymousChatImpl(id, master, new MessageListenerImpl(id));
 			String room_name;
+			terminal.printf("\n WELCOME INTO ANONYMOUS CHAT by ANTONIO GIULIO\n");
 			while(true) {
 				printMenu(terminal);
 				
@@ -178,7 +179,7 @@ public class TestChat {
 					}else
 						terminal.executeWithPropertiesConfigurator(
 								props -> ((TerminalProperties) props).setPromptColor("red"),
-								t -> ((TextTerminal) t).println("\n ERROR WHILE SENDIM MESSAGE \n"));
+								t -> ((TextTerminal) t).println("\n ERROR WHILE SENDIM MESSAGE: ROOM DOESN'T EXIST OR YOU ARE NOT IN THAT! \n"));
 			
 					break;
 				case 7:
@@ -241,6 +242,7 @@ public class TestChat {
 	
 	@SuppressWarnings("rawtypes")
 	public static void printMenu(TextTerminal terminal) {
+		
 		terminal.printf("\n1 - CREATE CHAT ROOM\n");
 		terminal.printf("\n2 - CREATE SECRET CHAT ROOM\n");
 		terminal.printf("\n3 - JOIN TO CHAT ROOM\n");

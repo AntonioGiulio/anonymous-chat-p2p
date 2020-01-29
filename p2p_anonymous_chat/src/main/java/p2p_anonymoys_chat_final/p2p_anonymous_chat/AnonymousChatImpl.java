@@ -284,7 +284,7 @@ public class AnonymousChatImpl implements AnonymousChat {
 						}
 					}
 	
-					this.sendMessage(_room_name, "[ " + _room_name + "] -- leaving this room -- [" + nick_map.get(_room_name) + "]!");
+					this.sendMessage(_room_name, "[" + _room_name + "] -- leaving this room -- [" + nick_map.get(_room_name) + "]!");
 					
 					//Se questo peer non è l'unico all'interno della room, viene semplicemente rimosso dalla lista dei peer della room.
 					HashSet<PeerAddress> peers_in_room;
