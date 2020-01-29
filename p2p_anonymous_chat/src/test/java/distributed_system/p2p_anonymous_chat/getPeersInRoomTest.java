@@ -1,4 +1,4 @@
-package p2p_anonymoys_chat_final.p2p_anonymous_chat;
+package distributed_system.p2p_anonymous_chat;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class joinSecretRoomTest {
+import distibuted_system.p2p_anonymous_chat.AnonymousChatImpl;
+import distibuted_system.p2p_anonymous_chat.MessageListener;
+
+public class getPeersInRoomTest {
+	
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
@@ -40,47 +44,43 @@ public class joinSecretRoomTest {
 		peer2 = new AnonymousChatImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		peer3 = new AnonymousChatImpl(3, "127.0.0.1", new MessageListenerImpl(3));
 	}
-
-
+	
 	@Test
 	public void test() {
-		
-		masterPeer.createSecretRoom("Secret_Room", "password");
-		
-		/*
-		 * Gli altri peer entrano nella secret room
-		 */
-		assertTrue(peer1.joinSecretRoom("Secret_Room", "password"));
-		assertTrue(peer2.joinSecretRoom("Secret_Room", "password"));
+		masterPeer.createRoom("Master_Room");
 		
 		/*
-		 * Verifichiamo che nella lista delle room a cui 
-		 * sono iscritti i peer ci sia la Secret_Room con il tag _ecret
+		 * Verifico che il masterPeer sia l'unico peer 
+		 * presente nella Master_Room
 		 */
-		assertEquals("Secret_Room_secret", peer1.listRooms().get(0));
-		assertEquals("Secret_Room_secret", peer2.listRooms().get(0));
+		assertEquals(1, masterPeer.getPeersInRoom("Master_Room"));
 		
-		
-		/*
-		 * non si può accedere ad una room segreta sbagliando la 
-		 * password
-		 */
-		assertFalse(peer3.joinSecretRoom("Secret_Room", "passwor"));
+		peer1.joinRoom("Master_Room");
+		peer2.joinRoom("Master_Room");
+		peer3.joinRoom("Master_Room");
 		
 		/*
-		 * Non si può accedere ad una room segreta che non esiste
+		 * Verifico che nella MasterRoom adesso vi siano 4 peers
 		 */
-		assertFalse(masterPeer.joinSecretRoom("Room_1", "psw"));
-		assertFalse(peer2.joinSecretRoom("Room_x", "psw"));
+		assertEquals(4, peer1.getPeersInRoom("Master_Room"));
 		
 		/*
-		 * Non si può accedere ad una room segreta a cui si 
-		 * è già iscritti
+		 * Se uno o più peers escono dalla room il numero deve 
+		 * decrescere
 		 */
-		assertFalse(peer1.joinSecretRoom("Secret_room", "password"));
-		assertFalse(peer2.joinSecretRoom("Secret_Room", "password"));
+		peer1.leaveRoom("Master_Room");
+		peer2.leaveRoom("Master_Room");
+		assertEquals(2, peer3.getPeersInRoom("Master_Room"));
+		
+		/*
+		 * Verico che non è possibile verificare il numero di peer
+		 * di una room che non esiste oppure a cui non siamo iscritti
+		 */
+		assertEquals(-1, peer1.getPeersInRoom("Room_1"));
+		peer2.createSecretRoom("Secret_Room", "password");
+		assertEquals(-1, peer3.getPeersInRoom("Secret_Room"));
 	}
-	
+
 	@AfterClass
 	public static void shutDown() {
 		masterPeer.leaveNetwork();
@@ -88,5 +88,4 @@ public class joinSecretRoomTest {
 		peer2.leaveNetwork();
 		peer3.leaveNetwork();
 	}
-
 }

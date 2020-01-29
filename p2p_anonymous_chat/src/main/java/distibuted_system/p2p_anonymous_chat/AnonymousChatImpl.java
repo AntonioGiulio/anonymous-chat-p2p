@@ -1,4 +1,4 @@
-package p2p_anonymoys_chat_final.p2p_anonymous_chat;
+package distibuted_system.p2p_anonymous_chat;
 
 import java.net.InetAddress;
 import java.util.ArrayList;

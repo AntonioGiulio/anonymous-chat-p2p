@@ -1,4 +1,4 @@
-package p2p_anonymoys_chat_final.p2p_anonymous_chat;
+package distributed_system.p2p_anonymous_chat;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class getRoomBackupTest {
+import distibuted_system.p2p_anonymous_chat.AnonymousChatImpl;
+import distibuted_system.p2p_anonymous_chat.MessageListener;
+
+public class leaveRoomTest {
 	private static AnonymousChatImpl masterPeer;
 	private static AnonymousChatImpl peer1;
 	private static AnonymousChatImpl peer2;
@@ -43,41 +46,37 @@ public class getRoomBackupTest {
 
 	@Test
 	public void test() {
-		
 		masterPeer.createRoom("Master_Room");
+		masterPeer.createSecretRoom("Secret_Room", "password");
+		
+		
+		/*
+		 * Verifichiamo che quando un peer lascia una room in cui è da solo
+		 * la room viene distrutta e può esserne creata un'altra con lo 
+		 * stesso nome;
+		 */
+		assertTrue(masterPeer.leaveRoom("Master_Room"));
+		assertEquals("Secret_Room_secret", masterPeer.listRooms().get(0));
+		
+		assertTrue(masterPeer.leaveRoom("Secret_Room"));
+		assertNull(masterPeer.listRooms());
+		
+		assertTrue(masterPeer.createRoom("Master_Room"));
+		assertTrue(masterPeer.createSecretRoom("Secret_Room", "password"));
+		
+		/*
+		 * Verifichiamo che è impossibile lasciare una room a cui non 
+		 * si è iscritti.
+		 */
+		assertFalse(masterPeer.leaveRoom("Room_1"));
+		
+		/*
+		 * Verifichiamo che è possibile lasciare una room che non ha creato 
+		 * lo stesso peer
+		 */
 		peer1.joinRoom("Master_Room");
-		peer2.joinRoom("Master_Room");
-		peer3.joinRoom("Master_Room");
-		peer1.sendMessage("Master_Room", "Ciao a tutti!");
-		peer2.sendMessage("Master_Room", "Come va?");
-		peer3.sendMessage("Master_Room", "Tutto bene!");
-		masterPeer.sendMessage("Master_Room", "Tutto bene anche a me!");
+		assertTrue(peer1.leaveRoom("Master_Room"));
 		
-		/*
-		 * Verifico che sia possibile accedere al backup di una chat
-		 * a cui si è iscritti.
-		 */
-		assertNotNull(peer1.getRoomBackup("Master_Room"));
-		
-		/*
-		 * Verifico che non si possa accedere al backup di una 
-		 * chat che abbiamo abbandonato.
-		 */
-		peer2.leaveRoom("Master_Room");
-		assertNull(peer2.getRoomBackup("Master_Room"));
-		
-		/*
-		 * Verifico che si possa accedere al backup di una chat che 
-		 * abbiamo abbandonato e in cui siamo rientrati.
-		 */
-		peer2.joinRoom("Master_Room");
-		assertNotNull(peer2.getRoomBackup("Master_Room"));
-		
-		/*
-		 * Verifico che non si possa accedere al backup di una 
-		 * chat che non esiste.
-		 */
-		assertNull(masterPeer.getRoomBackup("Room_1"));
 	}
 	
 	@AfterClass

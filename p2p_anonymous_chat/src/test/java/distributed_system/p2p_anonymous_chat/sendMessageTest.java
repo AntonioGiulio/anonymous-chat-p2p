@@ -1,4 +1,4 @@
-package p2p_anonymoys_chat_final.p2p_anonymous_chat;
+package distributed_system.p2p_anonymous_chat;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,9 @@ import org.beryx.textio.TextTerminal;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import distibuted_system.p2p_anonymous_chat.AnonymousChatImpl;
+import distibuted_system.p2p_anonymous_chat.MessageListener;
 
 public class sendMessageTest {
 	private static AnonymousChatImpl masterPeer;
