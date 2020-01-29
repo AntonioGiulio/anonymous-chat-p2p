@@ -36,7 +36,7 @@ public class TestChat {
 			public Object parseMessage(Object obj) {
 				TextIO textIO = TextIoFactory.getTextIO();
 				TextTerminal terminal = textIO.getTextTerminal();
-				terminal.printf("\n[" + peerId +"] (DM Received) " + obj + "\n\n");
+				terminal.printf("\n(DM Received) " + obj + "\n\n");
 				return "success";
 			}
 		}
