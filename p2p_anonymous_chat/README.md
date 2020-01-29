@@ -60,4 +60,30 @@ Il pacchetto ``src/main/java/distributed_system/p2p_anonymous_chat`` contiene le
  
  - _TestChat_ è la classe contenente il metodo main il quale realizza un'interfaccia command line per utilizzare il sistema. 
  
+Il pacchetto ``src/test/java/distributed_system/p2p_anonymous_chat`` contiene tutte le classi di test che utilizzano la libreria JUnit, una per ogni metodo dell'interfaccia _AnonymousChat_
+
+# 
+### Dockerization
+L'applicazione può essere eseguita in locale attraverso un container Docker.
  
+Nella root directory del progetto è presente il Dockerfile in cui ci sono tutti i dettagli per costruire l'immagine Docker.
+##### Come fare la build in Docker
+Per prima cosa bisogna posizionarsi nella root del progetto "p2p\_anonymous\_chat" dove è presente il Dockerfile, successivamente si può costruire l'immagine eseguendo il comando:
+
+``docker build --no-cache -t p2p-an-chat .``
+##### Come lanciare il master peer
+Arrivati a questo punto bisogna lanciare un container istanza dell'immagine Docker appena creata che fungerà da master peer.
+Bisogna lanciare il container in modalità interattiva con l'opzione -i e con due parametri:
+
+``docker run -i --name MASTER-PEER -e MASTERIP="127.0.0.1" -e ID=0 p2p-an-chat``
+
+La variabile MASTERIP rappresenta l'indirizzo IP del master, in questo caso localhost, e la variabile ID è l'id univoco del peer, nel caso del master è 0.
+
+##### Come lanciare un peer generico
+Dopo aver lanciato il master peer bisogna controllare l'id assegnatogli per lanciare altri peer. Bisogna eseguire il comando ``docker ps`` per visualizzare i container in esecuzione e poi ``docker inspect <masterContainer ID>`` per ottenere l'IP Address. 
+
+Ora possiamo lanciare altri peer con il comando:
+
+``docker run -i --name PEER-1 -e MASTERIP="172.17.0.2" -e ID=1 p2p-an-chat``
+
+
