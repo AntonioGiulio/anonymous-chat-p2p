@@ -2,7 +2,7 @@
 ### Architetture distribuite per il Cloud
 ### Università degli Studi di Salerno - Anno Accademico 2019/2020
 ### Prof. Alberto Negro
-### Prof. Carlo Cordasco
+### Prof. Gennaro Cordasco
 ### Dott. Carmine Spagnuolo
 #### Studente: Antonio Giulio 0522500732
 # 
